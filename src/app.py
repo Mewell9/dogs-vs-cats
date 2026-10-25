@@ -16,7 +16,7 @@ from dataset import (
     extract_archive,
     split_ready,
 )
-from model import evaluate_and_save, build_model, make_generators, train
+from model import evaluate_and_save, build_model, make_generators, show_test_predictions, train
 
 
 def save_class_preview(paths, title, destination):
@@ -63,6 +63,7 @@ def main():
     print(f"Test loss: {loss:.4f}")
     print(f"Test accuracy: {accuracy:.4f}")
     print("Saved model to models/dogs_vs_cats.keras")
+    show_test_predictions(TEST_DIR)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
 from tensorflow.keras.models import Sequential, load_model
@@ -89,3 +90,27 @@ def evaluate_and_save(test_data):
     loss, accuracy = model.evaluate(test_data)
     model.save(SAVED_MODEL_PATH)
     return loss, accuracy
+
+
+def show_test_predictions(test_dir, count=8):
+    """Print the true label and the predicted label for a few test photos."""
+    model = load_model(SAVED_MODEL_PATH)
+    generator = ImageDataGenerator(rescale=1.0 / 255)
+    test_data = generator.flow_from_directory(
+        test_dir,
+        target_size=IMAGE_SIZE,
+        batch_size=count,
+        class_mode="categorical",
+        shuffle=True,
+    )
+    images, labels = next(test_data)
+    probabilities = model.predict(images)
+    class_names = {index: name for name, index in test_data.class_indices.items()}
+    print("Test predictions:")
+    for index, (true_label, probs) in enumerate(zip(labels, probabilities), start=1):
+        actual = class_names[int(np.argmax(true_label))]
+        predicted = class_names[int(np.argmax(probs))]
+        print(
+            f"{index}. actual={actual} predicted={predicted} "
+            f"confidence={float(np.max(probs)):.2f}"
+        )
